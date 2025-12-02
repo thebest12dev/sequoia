@@ -23,9 +23,11 @@ include_directories("${ZLIB_INCLUDE_DIR}")
 file(GLOB_RECURSE SEQUOIA_SRC "${CMAKE_SOURCE_DIR}/src/core/*.cpp" "${CMAKE_SOURCE_DIR}/src/core/*.h")
 list(FILTER SEQUOIA_SRC EXCLUDE REGEX ".*/Main\\.(cpp|h)$")
 message(STATUS ${SEQUOIA_SRC})
+
 add_library(sequoia STATIC ${SEQUOIA_SRC})
 add_executable(sequoiacli "src/core/Main.cpp")
 target_include_directories(sequoia PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")
+
 target_include_directories(sequoiacli PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")
 
 target_link_libraries(sequoia PRIVATE nbt++ ZLIB::ZLIB)
