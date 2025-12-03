@@ -22,14 +22,25 @@ include_directories("${ZLIB_INCLUDE_DIR}")
 
 file(GLOB_RECURSE SEQUOIA_SRC "${CMAKE_SOURCE_DIR}/src/core/*.cpp" "${CMAKE_SOURCE_DIR}/src/core/*.h")
 list(FILTER SEQUOIA_SRC EXCLUDE REGEX ".*/Main\\.(cpp|h)$")
+list(FILTER SEQUOIA_SRC EXCLUDE REGEX ".*/CoreGui\\.(cpp|h)$")
 message(STATUS ${SEQUOIA_SRC})
 
-add_library(sequoia STATIC ${SEQUOIA_SRC})
-add_executable(sequoiacli "src/core/Main.cpp")
+add_library(sequoia STATIC ${SEQUOIA_SRC} )
+add_executable(sequoiacli "src/core/Main.cpp"
+
+external/imgui/imgui.cpp
+external/imgui/imgui_draw.cpp
+external/imgui/imgui_tables.cpp
+external/imgui/imgui_widgets.cpp
+external/imgui/backends/imgui_impl_win32.cpp
+external/imgui/backends/imgui_impl_dx11.cpp
+"src/core/CoreGui.cpp"
+
+)
 target_include_directories(sequoia PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")
 
 target_include_directories(sequoiacli PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")
-
+target_include_directories(sequoiacli PRIVATE "${CMAKE_SOURCE_DIR}/external/imgui/")
 target_link_libraries(sequoia PRIVATE nbt++ ZLIB::ZLIB)
 target_link_libraries(sequoiacli PRIVATE sequoia)
 
@@ -41,6 +52,8 @@ generate_export_header(sequoia
     EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/generated/SequoiaExport.h"
 )
 include_directories(sequoia PRIVATE "${CMAKE_BINARY_DIR}/generated/")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # C++20
 if (CMAKE_VERSION VERSION_GREATER 3.12)

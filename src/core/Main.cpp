@@ -1,11 +1,19 @@
-﻿
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include "./World.h"
 #include "Backup.h"
+#include "CoreGui.h"
+
+
 int main(const int argc, const char* argv[]) {
   std::cout << "Sequoia v0.0.1 alpha" << std::endl;
+  std::string option = argv[1];
+  if (option == "gui") {
+    std::cout << "launching GUI..." << std::endl;
 
+    sequoia::CoreGui::launchGui(); // pass to GUI
+    return 0;
+  }
   std::string worldPath = "";
  
   
@@ -25,7 +33,7 @@ int main(const int argc, const char* argv[]) {
   sequoia::World world(worldPath);
  
   std::cout << "INFO: opened world " << worldPath << std::endl;
-  std::string option = argv[1];
+  
   if (option == "backups") {
     std::string command = argv[2];
     
