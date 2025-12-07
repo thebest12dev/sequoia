@@ -1,5 +1,5 @@
 {
   "name": "sequoia",
-  "version": "0.2.0",
-  "dependencies": ["zlib"]
+  "version": "0.3.0",
+  "dependencies": ["zlib-ng", {"name": "libzip", "features": []}]
 }

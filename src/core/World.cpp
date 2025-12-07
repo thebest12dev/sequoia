@@ -1,4 +1,5 @@
 #include "World.h"
+#include <filesystem>
 #include "Backup.h"
 namespace sequoia {
   void World::initialize() {
@@ -13,8 +14,8 @@ namespace sequoia {
     data["version"] = 1;
     tag["data"] = nbt::tag_compound{data};
     std::ofstream create(worldPath + "/sequoia.dat", std::ios::binary);
-    zlib::ozlibstream sequoiaZlibStream{ create };
-    nbt::io::write_tag("root", tag, sequoiaZlibStream);
+    //zlib::ozlibstream sequoiaZlibStream{ create };
+    nbt::io::write_tag("root", tag, create);
     return;
   }
   World::World(std::string worldPath) : worldPath(worldPath) {
@@ -27,8 +28,8 @@ namespace sequoia {
       sequoiaNbtStream = std::ifstream{ worldPath + "/sequoia.dat", std::ios::binary };
     }
 
-    zlib::izlibstream sequoiaZlibStream{sequoiaNbtStream};
-    auto [_, seqNbtPtr] = nbt::io::read_tag(sequoiaZlibStream);
+    //zlib::izlibstream sequoiaZlibStream{sequoiaNbtStream};
+    auto [_, seqNbtPtr] = nbt::io::read_tag(sequoiaNbtStream);
     
     sequoiaNbt = nbt::value{ std::move(seqNbtPtr) };
 
@@ -43,7 +44,37 @@ namespace sequoia {
     worldName = static_cast<std::string>(levelNbt.at("Data").at("LevelName"));
   }
   World::~World() {
+    
+  }
+  std::filesystem::path World::getWorldPath() {
+    return std::filesystem::path(worldPath);
+  }
+  std::string World::getWorldName() {
+    return worldName;
+  }
+  std::optional<BackupConfig> World::getBackupConfig() {
+    try {
+      nbt::tag_compound tag{ sequoiaNbt.at("data").at("backupConfig").as<nbt::tag_compound>()};
+      BackupConfig bcf = {};
+      bcf.backupFormat = static_cast<CompressionFormat>(static_cast<int8_t>(tag.at("backupFormat")));
+      bcf.backupNameFormat = static_cast<std::string>(tag.at("backupNameFormat"));
+      bcf.destinationFolder = static_cast<std::string>(tag.at("destinationFolder"));
+      return bcf;
+    }
+    catch (std::exception) {
+      return std::nullopt;
+    }
+  }
+  void World::setBackupConfig(BackupConfig& config) {
+    nbt::tag_compound tag{};
+    tag["backupFormat"] = static_cast<int8_t>(config.backupFormat);
+    tag["backupNameFormat"] = config.backupNameFormat.c_str();
+    tag["destinationFolder"] = config.destinationFolder.string().c_str();
 
+    sequoiaNbt["data"]["backupConfig"] = static_cast<nbt::tag&&>(static_cast<nbt::tag_compound&>(tag));
+
+    std::ofstream create(worldPath + "/sequoia.dat", std::ios::binary);
+    nbt::io::write_tag("root", sequoiaNbt, create);
   }
   std::vector<Backup> World::getBackups() {
 

@@ -3,9 +3,7 @@
 #include <d3d11.h>
 #include <tchar.h>
 #include <dxgi1_2.h>
-#include "imgui.h"
-#include "backends/imgui_impl_win32.h"
-#include "backends/imgui_impl_dx11.h"
+
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 #pragma comment(lib, "d3d11.lib")

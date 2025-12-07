@@ -15,6 +15,7 @@ FetchContent_Declare(
   GIT_TAG master
 )
 find_package(ZLIB REQUIRED)
+find_package(libzip CONFIG REQUIRED)
 FetchContent_MakeAvailable(libnbtplusplus)
 include_directories("${libnbtplusplus_BINARY_DIR}")
 include_directories("${ZLIB_INCLUDE_DIR}")
@@ -41,7 +42,7 @@ target_include_directories(sequoia PRIVATE "${libnbtplusplus_SOURCE_DIR}/include
 
 target_include_directories(sequoiacli PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")
 target_include_directories(sequoiacli PRIVATE "${CMAKE_SOURCE_DIR}/external/imgui/")
-target_link_libraries(sequoia PRIVATE nbt++ ZLIB::ZLIB)
+target_link_libraries(sequoia PRIVATE nbt++ ZLIB::ZLIB libzip::zip)
 target_link_libraries(sequoiacli PRIVATE sequoia)
 
 

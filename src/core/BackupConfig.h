@@ -1,6 +1,7 @@
 #pragma once
 #include "SequoiaExport.h"
 #include "World.h"
+#include <filesystem>
 namespace sequoia {
   enum class CompressionFormat : uint8_t {
     ZLIB_COMPRESSED = 1,
@@ -10,11 +11,11 @@ namespace sequoia {
     GZIP_COMPRESSED = 5
   };
   struct SEQUOIA_EXPORT BackupConfig {
-    std::string destinationFolder = "";
+    std::filesystem::path destinationFolder = "";
     bool versioned = true;
     bool retention = true;
     int retenionLifetime = 30;
-    std::string backupNameFormat = "${datetime}_${worldName}";
+    std::string backupNameFormat = "${dateTime}_${worldName}";
     CompressionFormat backupFormat = CompressionFormat::RAW;
     int compressionRatio = 4;
   };

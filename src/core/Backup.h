@@ -5,7 +5,7 @@
 namespace sequoia {
   class SEQUOIA_EXPORT Backup {
   protected:
-    World world;
+    World& world;
     BackupConfig conf;
   public:
     /**
@@ -13,21 +13,23 @@ namespace sequoia {
      * 
      * @param world The world that when committed, will apply to.
      */
-    Backup(World world, BackupConfig conf);
+    Backup(World& world, BackupConfig conf);
 
     /**
      * @brief Gets the world that is associated with this backup.
      * 
      * @return The world.
      */
-    World getWorld();
+    World& getWorld();
 
     /**
      * 
      * 
      */
-    void writeToDisk();
+    bool backup();
     bool isPresentOnDisk();
     void restore();
+
+
   };
 }
