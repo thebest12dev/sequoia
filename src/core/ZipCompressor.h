@@ -17,7 +17,7 @@
 namespace fs = std::filesystem;
 namespace sequoia {
  
-  class ZipCompressor : Compressor {
+  class ZipCompressor : public Compressor {
   private:
     int numFiles = 0;
     bool progressEnabled = false;
