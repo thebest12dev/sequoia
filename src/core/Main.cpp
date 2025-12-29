@@ -11,6 +11,36 @@ int main(const int argc, const char* argv[]) {
   if (option == "gui") {
     
     std::cout << "launching GUI..." << std::endl;
+    sequoia::CoreGui::launchGui();
+  }
+  if (option == "background") {
+    std::cout << "launching background process..." << std::endl;
+    char path[MAX_PATH];
+    GetModuleFileName(NULL, path, MAX_PATH);
+
+    STARTUPINFOA si = { 0 };
+    PROCESS_INFORMATION pi = { 0 };
+    si.cb = sizeof(si);
+
+
+    char cmdLine[] = "internal -Dtask=sequoia_background_process -Dnamed_pipe=true -Dpipe_name=sequoia \
+      -Dprotocol=sequoia -Dconsole=false -Dinvoked_by=sequoia_console";
+
+    BOOL ok = CreateProcessA(
+      path,      
+      cmdLine,      
+      NULL,
+      NULL,
+      FALSE,
+      0,
+      NULL,
+      NULL,
+      &si,
+      &pi
+    );
+
+  }
+  if (option == "") {
     sequoia::CoreGui::launchGui(); // pass to GUI
     return 0;
   }

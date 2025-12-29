@@ -6,6 +6,8 @@
 #include "imgui.h"
 #include <dxgi1_2.h>
 #include <iostream>
+#include <sstream>
+#include "Version.h"
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_dx11.h"
 #pragma comment(lib, "d3d11.lib")
@@ -122,6 +124,18 @@ namespace sequoia {
 
       return (value == 0); 
     }
+    void textScale(const char* text, float sx, float sy, float ox = 0, float oy = 0) {
+      ImVec2 winSize1 = ImGui::GetWindowSize();
+      ImVec2 textSize = ImGui::CalcTextSize(text);
+
+
+      ImGui::SetCursorPos(ImVec2(
+        (winSize1.x - textSize.x) * sx + ox,
+        (winSize1.y - textSize.y) * sy + oy
+      ));
+
+      ImGui::Text(text);
+    }
   }
   void CoreGui::renderFrame() {
     if (initialized) {
@@ -129,9 +143,41 @@ namespace sequoia {
       ImGui_ImplWin32_NewFrame();
 
       ImGui::NewFrame();
+      if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
 
+          if (ImGui::MenuItem("Open World...")) {}
+          if (ImGui::MenuItem("Recent Worlds")) {}
+          if (ImGui::MenuItem("Settings...")) {}
+          if (ImGui::MenuItem("Close")) {}
+          ImGui::EndMenu();
+        }
 
-      ImGui::SetNextWindowSize(ImVec2(600, 500), ImGuiCond_Always);
+        if (ImGui::BeginMenu("World")) {
+
+          if (ImGui::MenuItem("Backup...")) {}
+          if (ImGui::MenuItem("World Settings...")) {}
+          ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("View")) {
+
+          if (ImGui::MenuItem("NBT Editor...")) {}
+          
+          ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Help")) {
+
+          if (ImGui::MenuItem("About...")) {}
+
+          ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+      }
+      
+
+     
+      
+     
 
       static float f = 0.0f;
       static int counter = 0;
@@ -139,7 +185,7 @@ namespace sequoia {
       ImGuiStyle& style = ImGui::GetStyle();
       style.WindowRounding = 10.0f;
       style.FrameRounding = 5.0f;
-      ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x - 2, viewport->Pos.y - 2));
+      ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x - 2, (viewport->Pos.y - 2) + ImGui::GetFrameHeight()));
       ImGui::SetNextWindowSize(ImVec2(viewport->Size.x + 4, viewport->Size.y + 4));
       ImGui::SetNextWindowViewport(viewport->ID);
       ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar
@@ -150,6 +196,7 @@ namespace sequoia {
         | ImGuiWindowFlags_NoNavFocus;
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
       ImGui::Begin("Sequoia", nullptr, flags);
+
       if (screen == 3) {
 
         ImGui::Text("Settings");
@@ -224,11 +271,11 @@ namespace sequoia {
         ImGui::PopStyleVar();
       }
       else if (screen == 1) {
-        ImGui::Text("Welcome to Sequoia!");
-        ImGui::Text("Choose a world in the dropdown to view backups, manage data and more!");
+        
 
         static int current = 0;
-
+        ImVec2 winSize = ImGui::GetContentRegionAvail();  
+        ImGui::BeginChild("LeftPane", ImVec2(winSize.x * 0.3f, winSize.y), true);
         if (ImGui::TreeNodeEx("Minecraft: Java Edition saves", ImGuiTreeNodeFlags_DefaultOpen))
         {
           if (ImGui::Selectable("New World (10)")) {
@@ -241,9 +288,21 @@ namespace sequoia {
 
           ImGui::TreePop();
         }
-        if (ImGui::Selectable("Select world...")) {
+        ImGui::EndChild();
+        ImGui::SameLine();
+        ImGui::BeginChild("RightPane", ImVec2(winSize.x * 0.7f, winSize.y), true);
+        std::stringstream version;
+        version << SEQUOIA_VERSION_MAJOR << "." << SEQUOIA_VERSION_MINOR << "." << SEQUOIA_VERSION_PATCH << " " << SEQUOIA_VERSION_CHANNEL;
 
-        }
+
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.5f)); 
+        
+        textScale((std::string("Sequoia v") + version.str().c_str()).c_str(), 0.5, 0.9);
+   
+        textScale("Warning: This software is still in development, do not use this seriously to backup your worlds!", 0.5, 0.9, 0.0f, 20.0f);
+        ImGui::PopStyleColor();
+ 
+        ImGui::EndChild();
         ImGui::End();
         ImGui::PopStyleVar();
       }
@@ -313,7 +372,7 @@ namespace sequoia {
     // the window
     hwnd = CreateWindow( wc.lpszClassName, _T("Sequoia"),
       WS_OVERLAPPEDWINDOW,
-      100, 100, 800, 500,
+      0, 0, 960, 600,
       nullptr, nullptr, wc.hInstance, nullptr);
 
 
