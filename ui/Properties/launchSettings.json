@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Sequoia (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Sequoia (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

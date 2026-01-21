@@ -27,10 +27,11 @@ namespace sequoia {
     private:
       std::queue<T> queue;
       std::mutex mutex;
-      std::condition_variable cv;
+      
     public:
+      std::condition_variable cv;
       void push(T value);
-      bool pop(T& value, bool done);
+      bool pop(T& value, bool& done);
       bool empty();
     };
 

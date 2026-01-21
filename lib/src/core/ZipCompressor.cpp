@@ -30,14 +30,15 @@ namespace sequoia {
     cv.notify_one();
   };
   template<typename T>
-  bool ZipCompressor::ThreadSafeQueue<T>::pop(T& value, bool done) {
-    std::unique_lock<std::mutex> lock(mutex);
-    cv.wait(lock, [this, done]() { return !queue.empty() || done; });
-    if (queue.empty()) return false;
-    value = std::move(queue.front());
-    queue.pop();
-    return true;
+  bool ZipCompressor::ThreadSafeQueue<T>::pop(T& value, bool& done) {
+      std::unique_lock<std::mutex> lock(mutex);
+      cv.wait(lock, [this, &done]() { return !queue.empty() || done; }); // capture by reference!
+      if (queue.empty()) return false;
+      value = std::move(queue.front());
+      queue.pop();
+      return true;
   }
+
   template<typename T>
   bool ZipCompressor::ThreadSafeQueue<T>::empty() {
     std::lock_guard<std::mutex> lock(mutex);
@@ -70,7 +71,9 @@ namespace sequoia {
     enqueueFolder(fileQueue, Compressor::target, "", zip);
 
     done = true;
+    fileQueue.cv.notify_all(); // wake all workers waiting
     for (auto& t : workers) t.join();
+
 
     addCompressedFiles(zip, compressedQueue);
 
@@ -147,8 +150,8 @@ namespace sequoia {
 
   void ZipCompressor::addCompressedFiles(zip_t* zip, ThreadSafeQueue<CompressedTask>& compressedQueue) {
     CompressedTask task;
-
-    while (compressedQueue.pop(task, true)) {
+    bool _ = true;
+    while (compressedQueue.pop(task, _)) {
 
       size_t dataSize = task.data.size();
       void* buf = nullptr;
@@ -179,7 +182,7 @@ namespace sequoia {
         }
         else {
 
-          zip_set_file_compression(zip, idx, ZIP_CM_STORE, 0);
+          zip_set_file_compression(zip, idx, ZIP_CM_DEFLATE, 6);
         }
       }
     }

@@ -6,7 +6,6 @@ if (POLICY CMP0141)
 endif()
 
 project ("sequoia")
-
 # Get libnbt++ (custom fork)
 include(FetchContent)
 FetchContent_Declare(
@@ -14,7 +13,7 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/thebest12dev/libnbtplusplus.git
   GIT_TAG master
 )
-find_package(ZLIB REQUIRED)
+find_package(zlib-ng CONFIG REQUIRED)
 find_package(libzip CONFIG REQUIRED)
 FetchContent_MakeAvailable(libnbtplusplus)
 include_directories("${libnbtplusplus_BINARY_DIR}")
@@ -42,7 +41,7 @@ target_include_directories(sequoia PRIVATE "${libnbtplusplus_SOURCE_DIR}/include
 
 target_include_directories(sequoiacli PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")
 target_include_directories(sequoiacli PRIVATE "${CMAKE_SOURCE_DIR}/external/imgui/")
-target_link_libraries(sequoia PRIVATE nbt++ ZLIB::ZLIB libzip::zip)
+target_link_libraries(sequoia PRIVATE nbt++ zlib-ng::zlib libzip::zip)
 target_link_libraries(sequoiacli PRIVATE sequoia)
 
 

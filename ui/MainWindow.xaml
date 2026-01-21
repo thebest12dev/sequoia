@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Sequoia.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Sequoia"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Sequoia">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+    <Grid>
+        <!-- Custom Title Bar -->
+        <Grid x:Name="AppTitleBar"
+          Height="40"
+          VerticalAlignment="Top">
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                <Image Width="24" Height="24"
+Source="Assets/Square44X44Logo.scale-200.png" Margin="20,16,0,0"/>
+                <TextBlock Text="Sequoia"
+                       FontWeight="SemiBold" Margin="6,16,20,0"/>
+                <MenuBar Margin="6,4,0,0">
+                    <MenuBarItem Title="File">
+                        <MenuFlyoutItem Text="New"/>
+                        <MenuFlyoutItem Text="Open"/>
+                        <MenuFlyoutItem Text="Save"/>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Exit"/>
+                    </MenuBarItem>
+
+                    <MenuBarItem Title="Edit">
+                        <MenuFlyoutItem Text="Undo"/>
+                        <MenuFlyoutItem Text="Redo"/>
+                    </MenuBarItem>
+
+                    <MenuBarItem Title="View">
+                        <MenuFlyoutItem Text="Zoom In"/>
+                        <MenuFlyoutItem Text="Zoom Out"/>
+                    </MenuBarItem>
+                    <MenuBarItem Title="World">
+                        <MenuFlyoutItem Text="NBT Editor"/>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Create Backup"/>
+                        
+                    </MenuBarItem>
+                    <MenuBarItem Title="Help">
+                        <MenuFlyoutItem Text="About" Click="AboutMenuItem_Click"/>
+
+                    </MenuBarItem>
+                </MenuBar>
+                
+
+            </StackPanel>
+        </Grid>
+
+        <!-- App content -->
+        <!--</Grid Margin="0,40,0,0" Height="36">-->
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="16,50,0,0">
+           <Frame x:Name="ContentFrame" /> 
+
+
+
+        </StackPanel>
+        
+        
+    </Grid>
+    
+
+
+</Window>

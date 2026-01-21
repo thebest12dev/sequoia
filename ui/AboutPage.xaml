@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Sequoia.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Sequoia"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
+        <Image Width="150" Height="150"
+Source="Assets/Square150X150Logo.scale-200.png" Margin="0,40,0,0" />
+        <TextBlock Text="Sequoia"
+       FontWeight="SemiBold"  FontSize="24" HorizontalAlignment="Center"/>
+        <TextBlock Text="An open-source, comprehensivue and cross-platform Minecraft world manager."
+FontWeight="Normal"  FontSize="14" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,16,0,0"/>
+        <TextBlock Text="Alpha v0.4.0"
+FontWeight="Normal"  FontSize="16" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,16,0,0"/>
+        <HyperlinkButton Content="Repository"
+FontWeight="Normal" NavigateUri="https://github.com/thebest12dev/sequoia" FontSize="14" HorizontalAlignment="Center" Margin="0,16,0,0"/>
+    </StackPanel>
+</Page>
