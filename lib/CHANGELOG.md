@@ -1,4 +1,15 @@
-# 0.3.0 (12/7/2025)
+# 0.4.0 (02/21/2026)
+⚠️ **Warning**: Incomplete build! Many features **not** fully implemented.
+  - Added incremental backup options!
+  - Added incremental backup groundwork!
+  - Added WinUI 3 GUI (work in progress)
+  - Deprecated ImGui user interface (for now)...
+  - Tons of bug fixes
+  - Removed Roboto font
+  - Implemented incremental backup locator functionality
+  - NBT changes: too large to show here
+
+# 0.3.0 (12/07/2025)
   - Implemented backups fully
   - Implemented zip compression
   - Added ATTRIBUTION.txt

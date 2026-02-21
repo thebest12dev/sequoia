@@ -5,8 +5,10 @@
 
 #include "imgui.h"
 #include <dxgi1_2.h>
+#include "LogHelpers.h"
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 #include "Version.h"
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_dx11.h"
@@ -354,7 +356,38 @@ namespace sequoia {
     }
     return DefWindowProc(hwnd, msg, wParam, lParam);
   }
+
   void CoreGui::launchGui() {
+    SEQUOIA_LOG_DEBUG("note: launching XAML UI, not legacy! specify -l to launch legacy GUI");
+    SEQUOIA_LOG_DEBUG("attempting to locate executable...");
+    if (std::filesystem::exists("ui/Sequoia.exe") && std::filesystem::is_regular_file("ui/Sequoia.exe")) {
+
+        STARTUPINFOA si = { 0 };
+        PROCESS_INFORMATION pi = { 0 };
+        si.cb = sizeof(si);
+
+
+        char cmdLine[] = "";
+
+        BOOL ok = CreateProcessA(
+            "ui/Sequoia.exe",
+            cmdLine,
+            NULL,
+            NULL,
+            FALSE,
+            0,
+            NULL,
+            NULL,
+            &si,
+            &pi
+        );
+        std::cout << "launched!" << std::endl;
+        return;
+    }
+    else {
+        std::cout << "error: cannot find executable! closing...";
+        return;
+    }
 
     WNDCLASSEX wc = {
         sizeof(WNDCLASSEX),
@@ -395,7 +428,7 @@ namespace sequoia {
     ImGuiIO& io = ImGui::GetIO();
 
     // whatever font
-    io.Fonts->AddFontFromFileTTF("fonts/Roboto-Regular.ttf", 18.0f);
+    //io.Fonts->AddFontFromFileTTF("fonts/Roboto-Regular.ttf", 18.0f);
     // loop
     BOOL useDarkMode = darkMode();
     HRESULT I = DwmSetWindowAttribute(hwnd, 20, &useDarkMode, sizeof(useDarkMode));

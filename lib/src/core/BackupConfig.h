@@ -17,7 +17,7 @@ namespace sequoia {
     int retenionLifetime = 30;
     std::string backupNameFormat = "${dateTime}_${worldName}";
     CompressionFormat backupFormat = CompressionFormat::RAW;
-    bool incrementalBackups = false;
+    bool incrementalBackups = true;
 
     int compressionRatio = 4;
   };

@@ -2,11 +2,17 @@
 #include <fstream>
 #include "./World.h"
 #include "./CoreGui.h"
+#include "LogHelpers.h"
 #include "./Backup.h"
 #include "Version.h"
 #include "../core/ZipCompressor.h"
 int main(const int argc, const char* argv[]) {
   std::cout << "Sequoia v" << SEQUOIA_VERSION_MAJOR << "." << SEQUOIA_VERSION_MINOR << "." << SEQUOIA_VERSION_PATCH << " " << SEQUOIA_VERSION_CHANNEL << std::endl;
+  if (argc <= 1) {
+    std::cout << "no arguments provided, launching GUI..." << std::endl;
+    sequoia::CoreGui::launchGui();
+    return 0;
+  }
   std::string option = argv[1];
   if (option == "gui") {
     
@@ -27,16 +33,16 @@ int main(const int argc, const char* argv[]) {
       -Dprotocol=sequoia -Dconsole=false -Dinvoked_by=sequoia_console";
 
     BOOL ok = CreateProcessA(
-      path,      
-      cmdLine,      
-      NULL,
-      NULL,
-      FALSE,
-      0,
-      NULL,
-      NULL,
-      &si,
-      &pi
+        path,
+        cmdLine,
+        NULL,
+        NULL,
+        FALSE,
+        0,
+        NULL,
+        NULL,
+        &si,
+        &pi
     );
 
   }
@@ -53,7 +59,10 @@ int main(const int argc, const char* argv[]) {
       worldPath = std::string(argv[i+1]);
       continue;
     }
-    
+    if ((std::string(argv[i]) == "-d" || std::string(argv[i]) == "--debug")) {
+        sequoia::setDebug(true);
+        continue;
+    }
   }
   if (worldPath == "") {
     std::cout << "error: world cannot be found! use -w or --world <world> to locate world." << std::endl;

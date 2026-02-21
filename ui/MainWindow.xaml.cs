@@ -1,4 +1,5 @@
 using Microsoft.UI;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -15,6 +16,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using WinRT.Interop;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Windows.UI.ViewManagement; // Might be needed for older APIs or specific checks
+// Other necessary usings (Microsoft.UI.Composition, etc.)
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,7 +31,9 @@ namespace Sequoia
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        public MainWindow()
+    private MicaController micaController;
+    private SystemBackdropConfiguration backdropConfiguration;
+    public MainWindow()
         {
             InitializeComponent();
             ExtendsContentIntoTitleBar = true;
@@ -34,7 +41,8 @@ namespace Sequoia
             ContentFrame.Navigate(typeof(HomePage));
             
         }
-        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+    
+    private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var window = new WindowBase();
 

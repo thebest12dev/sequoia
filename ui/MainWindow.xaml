@@ -13,12 +13,18 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
     <Grid>
-        <!-- Custom Title Bar -->
+    <Rectangle Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+      <Rectangle.Fill>
+        <SolidColorBrush Color="Black" />
+      </Rectangle.Fill>
+    </Rectangle>
+    <!-- Custom Title Bar -->
         <Grid x:Name="AppTitleBar"
           Height="40"
           VerticalAlignment="Top">
+      
 
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                 <Image Width="24" Height="24"
 Source="Assets/Square44X44Logo.scale-200.png" Margin="20,16,0,0"/>
                 <TextBlock Text="Sequoia"
