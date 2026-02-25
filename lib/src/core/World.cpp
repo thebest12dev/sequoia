@@ -82,8 +82,11 @@ namespace sequoia {
     std::vector<Backup> backupsList;
     for (nbt::value& tag : backups) {
       nbt::tag_compound c = tag.as<nbt::tag_compound>();
-     
-      Backup bc(*this, BackupConfig{});
+      
+      Backup bc(*this, getBackupConfig().has_value() ? getBackupConfig().value() : BackupConfig{});
+      bc.backupName = c["relativePath"].as<nbt::tag_string>().get();
+      bc.backupTime = c["backupTime"].as<nbt::tag_long>();
+      
       backupsList.push_back(bc);
 
     }

@@ -128,7 +128,7 @@ namespace sequoia {
     const fs::path& zipBase,
     zip_t* zip) {
     if (fs::is_empty(folder)) {
-      std::string dirName = zipBase.string() + "/";
+      std::string dirName = zipBase.generic_string() + "/";
       std::lock_guard<std::mutex> lock(zipMutex);
       if (zip_dir_add(zip, dirName.c_str(), ZIP_FL_ENC_UTF_8) < 0) {
         std::cerr << "failed to add empty folder: " << dirName << "\n";
@@ -174,7 +174,7 @@ namespace sequoia {
       zip_int64_t idx;
       {
         std::lock_guard<std::mutex> lock(zipMutex);
-        idx = zip_file_add(zip, task.zipPath.string().c_str(), source,
+        idx = zip_file_add(zip, task.zipPath.generic_string().c_str(), source,
           ZIP_FL_ENC_UTF_8 | ZIP_FL_OVERWRITE);
         if (idx < 0) {
           zip_source_free(source);

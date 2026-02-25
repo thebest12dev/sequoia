@@ -6,18 +6,29 @@
     xmlns:local="using:Sequoia"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  
     mc:Ignorable="d">
 
     <Grid>
-        <TextBox
-AcceptsReturn="True"
-TextWrapping="Wrap"
-Height="120"
-Width="300"
-PlaceholderText="Enter multiple lines of text"/>
-    <Button
-Height="120"
-Width="300" Content=""/>
+        
+
+    <TreeView Width="350" Height="auto">
+
+      <TreeView.RootNodes>
+
+        <TreeViewNode Content="Minecraft (Java Edition) saves" IsExpanded="True" >
+          <TreeViewNode.Children>
+            <TreeViewNode Content="Child 1" />
+            <TreeViewNode Content="Child 2" />
+          </TreeViewNode.Children>
+        </TreeViewNode>
+
+        
+
+      </TreeView.RootNodes>
+
+    </TreeView>
+
   </Grid>
 
   

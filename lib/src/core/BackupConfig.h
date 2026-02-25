@@ -14,7 +14,7 @@ namespace sequoia {
     std::filesystem::path destinationFolder = "";
     bool versioned = true;
     bool retention = true;
-    int retenionLifetime = 30;
+    int retentionLifetime = 30;
     std::string backupNameFormat = "${dateTime}_${worldName}";
     CompressionFormat backupFormat = CompressionFormat::RAW;
     bool incrementalBackups = true;

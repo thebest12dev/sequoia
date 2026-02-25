@@ -1,3 +1,10 @@
+# 0.5.0 (02/25/2026)
+  - Minor fix to zip compressor to generalize paths
+  - Added restoring backups (incremental for now)
+  - Added viewing backups
+  - Bug fixes
+ 
+
 # 0.4.0 (02/21/2026)
 ⚠️ **Warning**: Incomplete build! Many features **not** fully implemented.
   - Added incremental backup options!

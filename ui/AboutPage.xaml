@@ -15,7 +15,7 @@ Source="Assets/Square150X150Logo.scale-200.png" Margin="0,40,0,0" />
        FontWeight="SemiBold"  FontSize="24" HorizontalAlignment="Center"/>
         <TextBlock Text="An open-source, comprehensivue and cross-platform Minecraft world manager."
 FontWeight="Normal"  FontSize="14" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,16,0,0"/>
-        <TextBlock Text="Alpha v0.4.0"
+        <TextBlock Text="Alpha v0.5.0"
 FontWeight="Normal"  FontSize="16" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,16,0,0"/>
         <HyperlinkButton Content="Repository"
 FontWeight="Normal" NavigateUri="https://github.com/thebest12dev/sequoia" FontSize="14" HorizontalAlignment="Center" Margin="0,16,0,0"/>

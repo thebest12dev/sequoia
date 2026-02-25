@@ -13,11 +13,11 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
     <Grid>
-    <Rectangle Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <!--<Rectangle Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
       <Rectangle.Fill>
         <SolidColorBrush Color="Black" />
       </Rectangle.Fill>
-    </Rectangle>
+    </Rectangle>-->
     <!-- Custom Title Bar -->
         <Grid x:Name="AppTitleBar"
           Height="40"

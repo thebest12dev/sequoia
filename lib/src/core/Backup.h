@@ -2,10 +2,14 @@
 #include "SequoiaExport.h"
 #include "World.h"
 #include "BackupConfig.h"
+#include <stdint.h>
 namespace sequoia {
+  
   class SEQUOIA_EXPORT Backup {
   protected:
     World& world;
+    uintmax_t backupTime;
+    std::string backupName;
     BackupConfig conf;
   public:
     /**
@@ -21,15 +25,16 @@ namespace sequoia {
      * @return The world.
      */
     World& getWorld();
-
+    std::string getRelativeLocation();
+    uintmax_t getBackupTime();
     /**
      * 
      * 
      */
     bool backup();
     bool isPresentOnDisk();
-    void restore();
+    bool restore();
 
-
+    friend class World;
   };
 }

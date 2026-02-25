@@ -4,6 +4,7 @@
 #include "ZipCompressor.h"
 #include "World.h"
 #include <unordered_set>
+#include "LogHelpers.h"
 #include <unordered_map>
 namespace {
   
@@ -99,7 +100,7 @@ namespace {
       }
       else if (entry.is_directory())
       {
-        result.emplace(relative, FileInfo{
+        result.emplace(relative + "/", FileInfo{
             DIR_SENTINEL_SIZE,
             toFileTime(0)
           });
@@ -260,7 +261,7 @@ namespace {
 
     std::stringstream ss;
     ss << std::put_time(&tm, "%Y-%m-%dT%H-%M-%SZ");
-
+    
     return ss.str();
   }
   using LocatorMap = std::unordered_map<std::string, std::pair<std::string, std::pair<uintmax_t, uintmax_t>>>;
@@ -303,11 +304,12 @@ namespace {
       item["time"] = static_cast<int64_t>(val.second.first);
       item["size"] = static_cast<int64_t>(val.second.second);
       locator[key] = static_cast<nbt::tag&&>(item);
-
+      
     }
     std::ofstream create(path, std::ios::binary);
 
     nbt::io::write_tag("root", locator, create);
+    SEQUOIA_LOG_DEBUG("wrote to incremental locator!")
   }
   void FileLocator::loadNBT(std::filesystem::path path) {
     
@@ -324,33 +326,160 @@ namespace {
       netFiles.emplace(key, pair);
 
     }
+    SEQUOIA_LOG_DEBUG("loaded incremental locator!")
   }
   LocatorMap FileLocator::get() {
     return netFiles;
   }
+  zip_t* openZip(std::string zipPath) {
+    int err = 0;
+    zip_t* archive = zip_open(zipPath.c_str(), ZIP_RDONLY, &err);
+    if (!archive) {
+      zip_error_t ziperror;
+      zip_error_init_with_code(&ziperror, err);
+      std::cerr << "failed to open zip: "
+        << zip_error_strerror(&ziperror) << std::endl;
+      zip_error_fini(&ziperror);
+      return nullptr;
+    }
+    return archive;
+  }
+  bool extractFile(zip_t* archive, std::string fileInZip, std::string outputPath) {
+    if (fileInZip.ends_with("/")) {
+      std::filesystem::create_directories(outputPath);
+      return true;
+    }
+    zip_int64_t index = zip_name_locate(archive, fileInZip.c_str(), 0);
+    if (index < 0) {
+      std::cerr << "file not found in archive" << std::endl;
+      zip_close(archive);
+      return false;
+    }
 
-  
+    
+    zip_file_t* zfile = zip_fopen_index(archive, index, 0);
+    if (!zfile) {
+      std::cerr << "failed to open file inside zip" << std::endl;
+      zip_close(archive);
+      return 1;
+    }
+    std::filesystem::create_directories(fs::path{ outputPath }.parent_path());
+    std::ofstream out(outputPath, std::ios::binary);
+    if (!out) {
+      std::cerr << "failed to open output file" << std::endl;
+      zip_fclose(zfile);
+      zip_close(archive);
+      return 1;
+    }
+
+    constexpr std::size_t BUFFER_SIZE = 8192;
+    char buffer[BUFFER_SIZE];
+
+    zip_int64_t bytesRead = 0;
+    while ((bytesRead = zip_fread(zfile, buffer, BUFFER_SIZE)) > 0) {
+      out.write(buffer, bytesRead);
+      if (!out) {
+        std::cerr << "error: stream write error! data may be INCONSISTENT!" << std::endl;
+        break;
+      }
+    }
+
+    if (bytesRead < 0) {
+      std::cerr << "error during zip_fread" << std::endl;
+    }
+
+    out.close();
+    zip_fclose(zfile);
+  }
 }
 
 //random lib
 #include <random>
 #include <iomanip>
-
-
+#include <filesystem>
 namespace sequoia {
-  Backup::Backup(World& world, BackupConfig conf) : world(world), conf(conf) {};
+  Backup::Backup(World& world, BackupConfig conf) : world(world), conf(conf), backupName(""), backupTime(0) {};
   World& Backup::getWorld() {
     return world;
+  };
+  uintmax_t Backup::getBackupTime() {
+    return backupTime;
+  }
+  std::string Backup::getRelativeLocation() {
+    return backupName;
+  }
+  bool Backup::isPresentOnDisk() {
+    return (backupName != "" && backupTime != 0 && conf.destinationFolder != "");
+  }
+  bool Backup::restore() {
+    if (isPresentOnDisk()) {
+      /*
+        gather specific files from incremental locator, then basically
+        decompress specific files and write to a temp directory whilst
+        maintaining low memory usage
+      */
+      
+      FileLocator fl;
+      fl.loadNBT(conf.destinationFolder.string() + "/incrementalLocator.dat");
+      auto map = fl.get();
+      fs::path target = world.getBackupConfig()->destinationFolder.string() + "/incrementald_" + [] { static const char h[] = "0123456789abcdef"; std::mt19937 r(std::random_device{}()); std::string o(8, '0'); for (char& c : o) c = h[r() % 16]; return o; }();
+      fs::create_directory(target);
+      std::unordered_map<std::string, zip_t*> archives;
+      for (auto& [key, val] : map) {
+
+       
+        if (fs::is_regular_file(fs::path{conf.destinationFolder.generic_string() + "/" + val.first})) {
+          // typical compressed file sequence
+          zip_t* arch = nullptr;
+          if (archives.find(key) == archives.end()) {
+            arch = openZip(conf.destinationFolder.string() + "/" +val.first);
+            archives[key] = arch;
+          }
+          else {
+            arch = archives.at(key);
+          }
+          extractFile(arch, key, target.string() + "/" + key);
+        }
+
+        else if (fs::is_directory(fs::path{ conf.destinationFolder.generic_string() + "/" + val.first })) {
+          // we know it is raw/incremental base
+         auto file = conf.destinationFolder.string() + val.first + "/" + key;
+         if (fs::is_directory(file)) {
+           fs::create_directories(fs::path{target.string() + "/" + key}.parent_path());
+          }
+          else if (fs::is_regular_file(file)) {
+           fs::create_directories(fs::path{ target.string() + "/" + key }.parent_path());
+            fs::copy_file(file, target.string() + "/" + key);
+          }
+          
+          
+
+
+        }
+        
+      } 
+      // resource leakage
+      for (auto& [_, arch] : archives) {
+        zip_close(arch);
+      }
+    }
+    else {
+      std::cerr << "error: must be present on disk to restore!" << std::endl;
+      return false;
+    }
+    return true;
   };
   bool Backup::backup() {
     std::string overridePath = "";
     bool deleteOnTemp = false;
     DiffResult diffs;
     if (conf.incrementalBackups) {
+      SEQUOIA_LOG_DEBUG("configuring incremental backups...");
       nbt::tag& backupsTag = static_cast<nbt::tag&>(world.sequoiaNbt.at("data").at("backups"));
       nbt::tag_list& backupsList = static_cast<nbt::tag_list&>(backupsTag);
       
       if (backupsList.size() == 0) {
+        SEQUOIA_LOG_DEBUG("no backups, creating incremental base!")
         conf.backupFormat = CompressionFormat::RAW;
         conf.backupNameFormat = "incrementalBase";
       }
@@ -372,6 +501,7 @@ namespace sequoia {
           auto indexFileLocator = [](LocatorMap fileLocator) {
             std::unordered_map<std::string, FileInfo> index;
             for (auto& [key, val] : fileLocator) {
+
               index.emplace(key, FileInfo{ .size = val.second.second, .lastWrite = toFileTime(val.second.first) });
             }
             return index;
@@ -443,7 +573,8 @@ namespace sequoia {
 
 
         auto unixTime = duration_cast<seconds>(now.time_since_epoch()).count();
-
+        backupTime = time(nullptr);
+        backupName = relPath.string();
         data["backupTime"] = time(nullptr);
         data["compressionFormat"] = static_cast<uint8_t>(conf.backupFormat);
         data["relativePath"] = relPath.string();
@@ -456,7 +587,7 @@ namespace sequoia {
         for (auto b : fs::recursive_directory_iterator(dest)) {
            auto path = fs::relative(b.path(), dest);
           
-           map.emplace(path.generic_string(), std::pair{relPath.string(), std::pair{b.is_regular_file() ? unixWriteTime(b) : 0, b.file_size()}});
+           map.emplace(fs::is_directory(b.path()) ? path.generic_string() + "/" : path.generic_string() , std::pair{relPath.string(), std::pair{b.is_regular_file() ? unixWriteTime(b) : 0, b.file_size()}});
            
         }
         fl.set(map);
@@ -505,7 +636,8 @@ namespace sequoia {
 
 
         auto unixTime = duration_cast<seconds>(now.time_since_epoch()).count();
-
+        backupTime = time(nullptr);
+        backupName = relPath.string();
         data["backupTime"] = time(nullptr);
         data["compressionFormat"] = static_cast<uint8_t>(conf.backupFormat);
         data["relativePath"] = relPath.string();
