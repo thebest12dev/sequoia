@@ -25,7 +25,7 @@ list(FILTER SEQUOIA_SRC EXCLUDE REGEX ".*/Main\\.(cpp|h)$")
 list(FILTER SEQUOIA_SRC EXCLUDE REGEX ".*/CoreGui\\.(cpp|h)$")
 message(STATUS ${SEQUOIA_SRC})
 
-add_library(sequoia STATIC ${SEQUOIA_SRC}  )
+add_library(sequoia STATIC ${SEQUOIA_SRC}   "src/core/ExternalServer.h")
 add_executable(sequoiacli "src/core/Main.cpp"
 
 external/imgui/imgui.cpp
@@ -36,7 +36,7 @@ external/imgui/backends/imgui_impl_win32.cpp
 external/imgui/backends/imgui_impl_dx11.cpp
 "src/core/CoreGui.cpp"
 
- )
+  "src/core/ExternalServer.h")
 target_include_directories(sequoia PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")
 
 target_include_directories(sequoiacli PRIVATE "${libnbtplusplus_SOURCE_DIR}/include")

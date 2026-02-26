@@ -6,10 +6,33 @@
 #include "./Backup.h"
 #include "Version.h"
 #include "../core/ZipCompressor.h"
+#include <windows.h>
 namespace {
+  void attachWin32Console()
+  {
+   
+    if (!AllocConsole())
+      return;
+
+    
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    freopen_s(&fp, "CONIN$", "r", stdin);
+
+    
+    std::ios::sync_with_stdio(true);
+
+    std::cout.clear();
+    std::cerr.clear();
+    std::cin.clear();
+  }
 }
+
 int main(const int argc, const char* argv[]) {
   std::cout << "Sequoia v" << SEQUOIA_VERSION_MAJOR << "." << SEQUOIA_VERSION_MINOR << "." << SEQUOIA_VERSION_PATCH << " " << SEQUOIA_VERSION_CHANNEL << std::endl;
+  std::cin.get();
+  return 0;
   if (argc <= 1) {
     std::cout << "no arguments provided, launching GUI..." << std::endl;
     sequoia::CoreGui::launchGui();
@@ -22,30 +45,8 @@ int main(const int argc, const char* argv[]) {
     sequoia::CoreGui::launchGui();
   }
   if (option == "background") {
-    std::cout << "launching background process..." << std::endl;
-    char path[MAX_PATH];
-    GetModuleFileName(NULL, path, MAX_PATH);
+    std::cout << "background process started!" << std::endl;
 
-    STARTUPINFOA si = { 0 };
-    PROCESS_INFORMATION pi = { 0 };
-    si.cb = sizeof(si);
-
-
-    char cmdLine[] = "internal -Dtask=sequoia_background_process -Dnamed_pipe=true -Dpipe_name=sequoia \
-      -Dprotocol=sequoia -Dconsole=false -Dinvoked_by=sequoia_console";
-
-    BOOL ok = CreateProcessA(
-        path,
-        cmdLine,
-        NULL,
-        NULL,
-        FALSE,
-        0,
-        NULL,
-        NULL,
-        &si,
-        &pi
-    );
 
   }
   if (option == "") {
